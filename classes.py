@@ -12,7 +12,7 @@ class Game():
     def print_board(self):
         b = self.board
         print(f"""
-        A   B   C
+            A   B   C
     1)  {b['a1'] or ' '} | {b['b1'] or ' '} | {b['c1'] or ' '}
         ----------
     2)  {b['a2'] or ' '} | {b['b2'] or ' '} | {b['c2'] or ' '}
@@ -43,39 +43,40 @@ class Game():
     def place_piece(self):
         move = self.get_valid_move()
         self.board[move] = self.turn
-        self.check_winner() 
-        self.check_tie()  
-        self.turn = 'O' if self.turn == 'X' else 'X'
+        self.check_winner()  
+        if not self.winner:
+            self.check_tie()  
+        if not self.winner and not self.tie:
+            self.turn = 'O' if self.turn == 'X' else 'X'
 
     def check_winner(self):
-        pass
+        b = self.board
+        win_conditions = [
+            ('a1', 'b1', 'c1'),  
+            ('a2', 'b2', 'c2'),  
+            ('a3', 'b3', 'c3'),  
+            ('a1', 'a2', 'a3'),  
+            ('b1', 'b2', 'b3'),  
+            ('c1', 'c2', 'c3'),  
+            ('a1', 'b2', 'c3'),  
+            ('c1', 'b2', 'a3'),  
+        ]
+        for wc in win_conditions:
+            if b[wc[0]] and b[wc[0]] == b[wc[1]] == b[wc[2]]:
+                self.winner = b[wc[0]]
+                return
 
     def check_tie(self):
-        pass
+        if all(self.board[key] is not None for key in self.board):
+            self.tie = True
 
-    def check_for_winner(self):
-        self.board['a1'] and (self.board['a1'] == self.board['b1'] == self.board['c1'])
-
-        self.board['a2'] and (self.board['a2'] == self.board['b2'] == self.board['c2'])
-
-        self.board['a3'] and (self.board['a3'] == self.board['b3'] == self.board['c3'])
-
-        self.board['a1'] and (self.board['a1'] == self.board['b2'] == self.board['c3'])
-
-        self.board['a1'] and (self.board['a1'] == self.board['b1'] == self.board['c1'])
-
-        self.board['a1'] and (self.board['a1'] == self.board['b1'] == self.board['c1'])
-
-        self.board['a1'] and (self.board['a1'] == self.board['b1'] == self.board['c1'])
-        
-        self.board['a1'] and (self.board['a1'] == self.board['b1'] == self.board['c1'])
-
-
-    print(check_for_winner)
+    def play_game(self):
+        print("Shall we play a game?")
+        while not self.winner and not self.tie:
+            self.render()
+            self.place_piece()
+        self.render()  
 
 
 game = Game()
-while not game.winner and not game.tie:
-    game.render()
-    game.place_piece()
-game.render() 
+game.play_game()
